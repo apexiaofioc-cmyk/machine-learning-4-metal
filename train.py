@@ -9,7 +9,19 @@ from config import random_state
 from config import set_seed_42
 from model import build_cnn_model
 
+import wandb
+from wandb.integration.keras import WandbMetricsLogger
+
+os.environ['WANDB_API_KEY'] = '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'
+
 def main():
+    
+    wandb.init(project="Machine Learning for metal", config={
+    "learning_rate": cfg.LEARNING_RATE,
+    "epochs": cfg.EPOCHS,
+    "batch_size": cfg.BATCH_SIZE
+    })
+    
     print("1. 正在加载数据...")
     X_train = np.load(Path(cfg.TRAIN_DATA_DIR/ "X_train.npy"))
     y_train = np.load(Path(cfg.TRAIN_DATA_DIR/ "Y_train.npy"))
@@ -37,7 +49,7 @@ def main():
     
     # 在训练脚本中进行 compile (符合模型只管结构，训练管策略的原则)
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=0.001), 
+        optimizer=keras.optimizers.Adam(learning_rate=cfg.LEARNING_RATE), 
         loss='binary_crossentropy', 
         metrics=['accuracy']
     )
@@ -51,13 +63,15 @@ def main():
         restore_best_weights=True
     )
     
+    wandb_callbacks = WandbMetricsLogger()
+
     history = model.fit(
         X_train_norm, y_train,
         epochs=cfg.EPOCHS, 
         batch_size=cfg.BATCH_SIZE,
         shuffle=True, 
         validation_data=(X_test_norm, y_test),
-        callbacks=[early_stopping],
+        callbacks=[early_stopping, wandb_callbacks],
         verbose=1 
     )
     print("5. 保存模型与标准化参数...")
@@ -70,9 +84,13 @@ def main():
     np.save(Path(cfg.MODEL_SAVE_DIR/ "mean_val.npy"), mean_val)
     np.save(Path(cfg.MODEL_SAVE_DIR/ "std_val.npy"), std_val)
     print(f"✅训练完成！资产已保存至: {cfg.MODEL_SAVE_DIR}")
+
     
     print("6. 绘制训练曲线...")
     plot_history(history)
+
+    wandb.finish()
+
 def plot_history(history):
     """提取出的绘图辅助函数"""
     plt.figure(figsize=(10, 4))
@@ -91,7 +109,11 @@ def plot_history(history):
     plot_path = Path(cfg.MODEL_SAVE_DIR/ "training_history.png")
     plt.savefig(plot_path)
     print(f"曲线图已保存至: {plot_path}")
+
+    wandb.log({"training_curve": wandb.Image(str(plot_path))})
+
     plt.show()
+
 if __name__ == "__main__":
     set_seed_42(random_state)
     main()
