@@ -12,7 +12,7 @@ from model import build_cnn_model
 import wandb
 from wandb.integration.keras import WandbMetricsLogger
 
-os.environ['WANDB_API_KEY'] = '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'
+os.environ['WANDB_API_KEY'] = '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'#在这里输入你的wandbapi
 
 def main():
     
