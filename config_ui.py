@@ -37,7 +37,8 @@ DEFAULT_SETTINGS = {
     "naming_prefix_alumi": "Alball",
     "naming_prefix_steel": "Stball",
     "include_timestamp": True,
-    "include_speed": True
+    "include_speed": True,
+    "include_ball_count": True
 }
 
 def load_settings():
@@ -161,6 +162,9 @@ class ConfigUIApp:
         
         self.vars["include_timestamp"] = tk.BooleanVar(value=self.settings.get("include_timestamp", True))
         tk.Checkbutton(lf, text="文件名包含时间戳 (例如 _123456)", variable=self.vars["include_timestamp"]).grid(row=3, column=0, columnspan=2, sticky="w", pady=5)
+        
+        self.vars["include_ball_count"] = tk.BooleanVar(value=self.settings.get("include_ball_count", True))
+        tk.Checkbutton(lf, text="文件名包含小球数量 (例如 _n=10)", variable=self.vars["include_ball_count"]).grid(row=4, column=0, columnspan=2, sticky="w", pady=5)
 
     def save_and_exit(self):
         try:

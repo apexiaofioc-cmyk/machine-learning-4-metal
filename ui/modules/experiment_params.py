@@ -33,5 +33,5 @@ class ExperimentParamsPanel(CardFrame):
         # 小球数量
         tk.Label(self, text="设定小球数量(个):").grid(row=4, column=0, sticky="w", pady=5)
         self.controller.balls_entry = tk.Entry(self, width=10)
-        self.controller.balls_entry.insert(0, "1")
+        self.controller.balls_entry.insert(0, "10")
         self.controller.balls_entry.grid(row=4, column=1, sticky="w")

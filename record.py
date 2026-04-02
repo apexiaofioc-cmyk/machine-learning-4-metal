@@ -9,13 +9,10 @@ import serial
 import serial.tools.list_ports
 
 from ui.layouts.main_layout import MainLayout
-from config import GATHER_DATA_DIR, SR, INCLUDE_SPEED, INCLUDE_TIMESTAMP, INCLUDE_BALL_COUNT
+from config import ORIGIN_DATA_DIR, TEST_DIR, SR, INCLUDE_SPEED, INCLUDE_TIMESTAMP, INCLUDE_BALL_COUNT
 
 class DataCollectorApp:
-    """
-    现在变成了一个纯粹的 控制器 (Controller/Model) 
-    负责线程、音频采集、和串口硬件通讯。不负责任何具体的 UI 渲染。
-    """
+
     def __init__(self, root):
         self.root = root
         
@@ -33,7 +30,7 @@ class DataCollectorApp:
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 1
         self.RATE = SR
-        self.SAVE_DIR = GATHER_DATA_DIR
+        self.SAVE_DIR = ORIGIN_DATA_DIR
 
         # --- 连接 UI ---
         # 实例化位于 Layout 的主视图骨架，把自己 (self) 传递过去作为业务处理器
@@ -126,7 +123,13 @@ class DataCollectorApp:
 
         sub_folder = ball_type
         timestamp = datetime.datetime.now().strftime("%H%M%S")
-        target_dir = os.path.join(self.SAVE_DIR, sub_folder)
+        
+        data_type = self.data_type_var.get()
+        if data_type == "test":
+            target_dir = os.path.join(TEST_DIR, sub_folder)
+        else:
+            target_dir = os.path.join(ORIGIN_DATA_DIR, sub_folder)
+            
         if not os.path.exists(target_dir): os.makedirs(target_dir)
 
         filename_parts = [f"L{current_label}", ball_type]
@@ -184,16 +187,20 @@ class DataCollectorApp:
             self.stream.stop_stream()
             self.stream.close()
 
-        wf = wave.open(self.filename, 'wb')
-        wf.setnchannels(self.CHANNELS)
-        wf.setsampwidth(self.audio.get_sample_size(self.FORMAT))
-        wf.setframerate(self.RATE)
-        wf.writeframes(b''.join(self.frames))
-        wf.close()
+        try:
+            wf = wave.open(self.filename, 'wb')
+            wf.setnchannels(self.CHANNELS)
+            wf.setsampwidth(self.audio.get_sample_size(self.FORMAT))
+            wf.setframerate(self.RATE)
+            wf.writeframes(b''.join(self.frames))
+            wf.close()
+        except Exception as e:
+            messagebox.showerror("保存错误", f"保存音频文件失败:\n{e}")
 
+        # 如果录制时间结束，不要自动退出整个程序，只需停止当前录音即可
         self.btn_record.config(state="normal")
         self.btn_stop_record.config(state="disabled")
-        self.status_label.config(text=f" 保存成功: {os.path.basename(self.filename)}", fg="green")
+        self.status_label.config(text=f"保存成功: {os.path.basename(self.filename)}", fg="green")
 
     def on_closing(self):
         if self.is_recording: self.stop_recording()

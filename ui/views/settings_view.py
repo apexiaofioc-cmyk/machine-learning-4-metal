@@ -9,7 +9,7 @@ from ui.components.buttons import PrimaryButton
 from config import (GATHER_DATA_DIR, ORIGIN_DATA_DIR, TRAIN_DATA_DIR, TEST_DIR, MODEL_SAVE_DIR, 
                     SR, BATCH_SIZE, EPOCHS, 
                     NAMING_PREFIX_ALUMI, NAMING_PREFIX_STEEL,
-                    INCLUDE_TIMESTAMP, INCLUDE_SPEED)
+                    INCLUDE_TIMESTAMP, INCLUDE_SPEED, INCLUDE_BALL_COUNT)
 
 class SettingsView(ttk.Frame):
     """
@@ -76,6 +76,9 @@ class SettingsView(ttk.Frame):
         
         self.settings_vars["include_timestamp"] = tk.BooleanVar(value=self.current_settings.get("include_timestamp", INCLUDE_TIMESTAMP))
         tk.Checkbutton(grid_frame, text="自动包含时间戳到文件名", variable=self.settings_vars["include_timestamp"]).grid(row=6, column=0, columnspan=2, sticky="w")
+        
+        self.settings_vars["include_ball_count"] = tk.BooleanVar(value=self.current_settings.get("include_ball_count", INCLUDE_BALL_COUNT))
+        tk.Checkbutton(grid_frame, text="自动包含小球数量到文件名", variable=self.settings_vars["include_ball_count"]).grid(row=7, column=0, columnspan=2, sticky="w")
 
         # 底部按钮组件
         PrimaryButton(self, text="💾 立即保存配置 (需重启应用生效)", command=self.save_settings).pack(pady=20)

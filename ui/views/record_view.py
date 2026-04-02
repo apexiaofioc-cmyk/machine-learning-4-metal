@@ -40,6 +40,13 @@ class RecordView(ttk.Frame):
         # 这里演示了一半由自己写，不一定全要强制拆成模块
         self.audio_panel = CardFrame(self.left_frame, title="4. 核心采集控制", fill="both", expand=True)
 
+        type_frame = tk.Frame(self.audio_panel)
+        type_frame.pack(fill="x", pady=2)
+        tk.Label(type_frame, text="选择录制数据的类型:").pack(side="left", padx=5)
+        self.controller.data_type_var = tk.StringVar(value="origin")
+        tk.Radiobutton(type_frame, text="初始数据 (Origin)", variable=self.controller.data_type_var, value="origin").pack(side="left")
+        tk.Radiobutton(type_frame, text="盲测集数据 (Test)", variable=self.controller.data_type_var, value="test").pack(side="left")
+
         mic_frame = tk.Frame(self.audio_panel)
         mic_frame.pack(fill="x", pady=2)
         tk.Label(mic_frame, text="麦克风:").pack(side="left")
