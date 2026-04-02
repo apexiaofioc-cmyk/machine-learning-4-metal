@@ -1,42 +1,94 @@
 import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-
-from pathlib import Path
+import json
 import random
+from pathlib import Path
 import numpy
 import keras
 
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 # 获取当前 config.py 所在的绝对目录 (项目根目录)
 BASE_DIR = Path(__file__).resolve().parent
+SETTINGS_FILE = BASE_DIR / "settings.json"
 
-# 1. 音频参数
-SR = 44100               #采样率
-DURATION = 0.5
-OVERLAP = 0.5            # 50% 的重叠率 (滑动窗口切片)
-N_FFT = 2048             # FFT窗口大小
-HOP_LENGTH = 1024        # 滑动步长
+# 提供一个默认的 fallback，以防 JSON 文件不存在或被误删
+_DEFAULT_CONFIG = {
+    "origin_data_dir": "data_origin",
+    "train_data_dir": "data_train",
+    "test_dir": "data_test",
+    "model_save_dir": "model",
+    "model_name": "metal_classifier.keras",
+    "gather_data_dir": "data_origin",
+    "batch_size": 32,
+    "epochs": 50,
+    "learning_rate": 0.001,
+    "steel_label": 1,
+    "alumi_label": 0,
+    "random_state": False,
+    "sr": 44100,
+    "duration": 0.5,
+    "overlap": 0.5,
+    "n_fft": 2048,
+    "hop_length": 1024,
+    "naming_prefix_alumi": "Alball",
+    "naming_prefix_steel": "Stball",
+    "include_timestamp": True,
+    "include_speed": True
+}
 
-# 2. 训练参数
-BATCH_SIZE = 32
-EPOCHS = 50
-LEARNING_RATE = 0.001
-steel_lable = 1
-alumi_lable = 0
-random_state = False#种子是否随机生成，默认为False
+# 1. 自动读取并应用
+_current_config = _DEFAULT_CONFIG.copy()
+if SETTINGS_FILE.exists():
+    try:
+        with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
+            _loaded = json.load(f)
+            _current_config.update(_loaded)
+    except Exception as e:
+        print(f"Warning: 读取 {SETTINGS_FILE} 失败，使用默认配置。({e})")
 
-# 3. 路径配置 (使用 pathlib 拼接路径)
-ORIGIN_DATA_DIR = BASE_DIR / "data_origin"   # 原始训练数据文件夹
-TRAIN_DATA_DIR = BASE_DIR/"data_train"       # 处理后训练数据文件夹
-TEST_DIR = BASE_DIR / "data_test"            # 盲测数据文件夹
-MODEL_SAVE_DIR = BASE_DIR / "model"          # 模型保存文件夹
-MODEL_NAME = "metal_classifier.keras"
-GATHER_DATA_DIR = ORIGIN_DATA_DIR            # record程序保存文件夹，默认为ORIGIN_DATA_DIR，如果你想为盲测收集数据，将此项改为TRAIN_DATA_DIR
+# 2. 导出所有参数供其他模块使用 (与原变量名一致)
+# -- 音频参数 --
+SR = _current_config["sr"]
+DURATION = _current_config["duration"]
+OVERLAP = _current_config["overlap"]
+N_FFT = _current_config["n_fft"]
+HOP_LENGTH = _current_config["hop_length"]
 
-def set_seed_42(random_state,seed=42):
+# -- 训练参数 --
+BATCH_SIZE = _current_config["batch_size"]
+EPOCHS = _current_config["epochs"]
+LEARNING_RATE = _current_config["learning_rate"]
+steel_lable = _current_config["steel_label"] # 注意原拼写是 lable，为了兼容其他文件暂时保留
+alumi_lable = _current_config["alumi_label"]
+random_state = _current_config["random_state"]
+
+# -- UI与命名参数 --
+NAMING_PREFIX_ALUMI = _current_config["naming_prefix_alumi"]
+NAMING_PREFIX_STEEL = _current_config["naming_prefix_steel"]
+INCLUDE_TIMESTAMP = _current_config.get("include_timestamp", True)
+INCLUDE_SPEED = _current_config.get("include_speed", True)
+
+# -- 路径配置 (使用 pathlib 拼接路径) --
+# 为了支持绝对路径和相对路径，我们进行简单判断
+def _resolve_path(path_str):
+    p = Path(path_str)
+    if p.is_absolute():
+        return p
+    return BASE_DIR / p
+
+ORIGIN_DATA_DIR = _resolve_path(_current_config["origin_data_dir"])
+TRAIN_DATA_DIR = _resolve_path(_current_config["train_data_dir"])
+TEST_DIR = _resolve_path(_current_config["test_dir"])
+MODEL_SAVE_DIR = _resolve_path(_current_config["model_save_dir"])
+MODEL_NAME = _current_config["model_name"]
+GATHER_DATA_DIR = _resolve_path(_current_config["gather_data_dir"])
+
+
+def set_seed_42(rs_flag, seed=42):
     """
     设定随机数种子为42
     """
-    if (random_state == False):
+    if (rs_flag == False):
         random.seed(seed)                     
         numpy.random.seed(seed)               # NumPy
         keras.utils.set_random_seed(seed)     # Keras
@@ -48,12 +100,13 @@ def init_project_dirs():
     """
     初始化项目所需的文件夹
     """
-    # parents=True 相当于 mkdir -p，exist_ok=True 表示存在也不报错
     ORIGIN_DATA_DIR.mkdir(parents=True, exist_ok=True)
     TEST_DIR.mkdir(parents=True, exist_ok=True)
     MODEL_SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    # GATHER_DATA_DIR, TRAIN_DATA_DIR 等如果需要也可以一起创建
+    TRAIN_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    GATHER_DATA_DIR.mkdir(parents=True, exist_ok=True)
     print("项目目录初始化完成。")
 
-# 如果有人直接运行 python config.py，则执行创建目录
 if __name__ == "__main__":
     init_project_dirs()
