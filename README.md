@@ -17,3 +17,4 @@ cd machine-learning-4-metal
 pip install -r requirements.txt
 #4.开始录制
 请尽量录制时长相近的短片段以保证训练效果
+#ui界面需要用到主题包

@@ -3,7 +3,6 @@ import json
 import random
 from pathlib import Path
 import numpy
-import keras
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
@@ -33,7 +32,8 @@ _DEFAULT_CONFIG = {
     "naming_prefix_alumi": "Alball",
     "naming_prefix_steel": "Stball",
     "include_timestamp": True,
-    "include_speed": True
+    "include_speed": True,
+    "include_ball_count": True
 }
 
 # 1. 自动读取并应用
@@ -67,6 +67,7 @@ NAMING_PREFIX_ALUMI = _current_config["naming_prefix_alumi"]
 NAMING_PREFIX_STEEL = _current_config["naming_prefix_steel"]
 INCLUDE_TIMESTAMP = _current_config.get("include_timestamp", True)
 INCLUDE_SPEED = _current_config.get("include_speed", True)
+INCLUDE_BALL_COUNT = _current_config.get("include_ball_count", True)
 
 # -- 路径配置 (使用 pathlib 拼接路径) --
 # 为了支持绝对路径和相对路径，我们进行简单判断
@@ -89,7 +90,8 @@ def set_seed_42(rs_flag, seed=42):
     设定随机数种子为42
     """
     if (rs_flag == False):
-        random.seed(seed)                     
+        import keras
+        random.seed(seed)
         numpy.random.seed(seed)               # NumPy
         keras.utils.set_random_seed(seed)     # Keras
         print("0.已固定随机数种子为42")

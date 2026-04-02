@@ -1,0 +1,14 @@
+{
+    "gather_data_dir": "D:\\fdurop\\machinelearning\\machine-learning-4-metal\\data_origin",
+    "origin_data_dir": "D:\\fdurop\\machinelearning\\machine-learning-4-metal\\data_origin",
+    "train_data_dir": "D:\\fdurop\\machinelearning\\machine-learning-4-metal\\data_train",
+    "test_dir": "D:\\fdurop\\machinelearning\\machine-learning-4-metal\\data_test",
+    "model_save_dir": "D:\\fdurop\\machinelearning\\machine-learning-4-metal\\model",
+    "naming_prefix_alumi": "306ball",
+    "naming_prefix_steel": "420ball",
+    "epochs": 50,
+    "batch_size": 32,
+    "sr": 44100,
+    "include_speed": true,
+    "include_timestamp": true
+}

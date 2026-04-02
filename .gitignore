@@ -5,3 +5,24 @@ data_test/
 data_train/
 model/
 wandb/
+# 虚拟环境
+.venv/
+env/
+venv/
+ENV/
+
+# 缓存与编译产物
+__pycache__/
+*.pyc
+
+# 编辑器与系统文件
+.vscode/
+.idea/
+.DS_Store
+
+# 数据和模型
+data_origin/
+data_test/
+data_train/
+model/
+wandb/
