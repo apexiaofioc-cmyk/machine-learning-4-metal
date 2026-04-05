@@ -1,5 +1,5 @@
 import os
-os.environ["KERAS_BACKEND"] = "torch"#选择引擎
+os.environ["KERAS_BACKEND"] = "tensorflow"#选择引擎
 from pathlib import Path
 import keras
 import numpy as np
@@ -63,6 +63,14 @@ def main():
         restore_best_weights=True
     )
     
+    # 【新增】当验证集不再下降时，动态缩小学习率，帮助模型平稳收敛
+    reduce_lr = keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,       # 触发时，学习率按 0.5 的比例缩减
+        patience=3,       # 容忍 3 个 epoch 不下降
+        min_lr=1e-6       # 学习率的最低下限，防止降到 0
+    )
+    
     wandb_callbacks = WandbMetricsLogger()
 
     history = model.fit(
@@ -71,7 +79,7 @@ def main():
         batch_size=cfg.BATCH_SIZE,
         shuffle=True, 
         validation_data=(X_test_norm, y_test),
-        callbacks=[early_stopping, wandb_callbacks],
+        callbacks=[early_stopping, reduce_lr, wandb_callbacks],
         verbose=1 
     )
     print("5. 保存模型与标准化参数...")

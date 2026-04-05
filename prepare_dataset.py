@@ -4,8 +4,8 @@ from data_utils import build_dataset, get_audio_input_shape
 import config as cfg
 
 if __name__ == "__main__":
-    steel_folder = Path(cfg.ORIGIN_DATA_DIR/"steel")  
-    alumi_folder = Path(cfg.ORIGIN_DATA_DIR/"alumi") 
+    steel_folder = Path(cfg.ORIGIN_DATA_DIR/"304ball")  
+    alumi_folder = Path(cfg.ORIGIN_DATA_DIR/"420ball") 
     save_dir = cfg.TRAIN_DATA_DIR
     
     

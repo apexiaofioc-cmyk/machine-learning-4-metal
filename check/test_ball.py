@@ -51,8 +51,8 @@ def analyze_multiple_folders(file_paths, sr=44100, n_fft=2048):
 # --- 实验配置：在此处输入你的 5 个文件路径 ---
 # 你可以随意组合不同文件夹下的 WAV 文件
 my_files = [
-    r'D:\fdurop\machinelearning\machine-learning-4-metal\check\304ball\L0_304ball_v=1.5_n=10_191415.wav',
-    r'D:\fdurop\machinelearning\machine-learning-4-metal\check\420ball\L0_420ball_v=1.5_n=10_191603.wav',
+    r'D:\fdurop\machinelearning\machine-learning-4-metal\data_origin\AIball\L0_AIball_v=1_n=10_174642.wav',
+    r'D:\fdurop\machinelearning\machine-learning-4-metal\data_origin\AIball\L0_AIball_v=1_n=10_174750.wav',
     r'D:\fdurop\machinelearning\machine-learning-4-metal\check\alball\L0_alball_v=1.5_n=10_192245.wav',
     r'D:\fdurop\machinelearning\machine-learning-4-metal\check\carbon_steel\L0_carbon_steel_v=1.5_n=10_192053.wav',
     r'D:\fdurop\machinelearning\machine-learning-4-metal\check\GCR15\L0_GCR15_v=1.5_n=10_191748.wav'
