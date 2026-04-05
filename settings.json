@@ -12,5 +12,9 @@
     "sr": 44100,
     "include_speed": true,
     "include_timestamp": true,
-    "include_ball_count": true
+    "include_ball_count": true,
+    "class0_dir": "304ball",
+    "class0_name": "304ball",
+    "class1_dir": "420ball",
+    "class1_name": "420ball"
 }

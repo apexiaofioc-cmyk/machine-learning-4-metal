@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from ui.views.record_view import RecordView
 from ui.views.settings_view import SettingsView
+from ui.views.train_predict_view import TrainPredictView
 
 class MainLayout:
     """
@@ -12,7 +13,7 @@ class MainLayout:
         self.root = root
         self.controller = controller
         self.root.title("声音信号核心中枢 - 组件化高级版")
-        self.root.geometry("900x750")
+        self.root.geometry("900x850") # 设置稍大以容纳更多组件
         
         # 统一风格主题
         self.style = ttk.Style(self.root)
@@ -31,4 +32,8 @@ class MainLayout:
         # -> 第二个页面子树：系统设置
         self.tab_settings = SettingsView(self.notebook, controller=self.controller)
         self.notebook.add(self.tab_settings, text="⚙️ 系统配置底层面板")
+
+        # -> 第三个页面子树：训练与验证
+        self.tab_train_predict = TrainPredictView(self.notebook, controller=self.controller)
+        self.notebook.add(self.tab_train_predict, text="🧠 训练与盲测模块")
 
